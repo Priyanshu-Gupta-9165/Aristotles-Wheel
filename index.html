@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Aristotle's Wheel — The Paradox, Rolled Out | Priyanshu Gupta</title>
+<meta name="description" content="An interactive exploration of Aristotle's wheel paradox: two concentric circles, one revolution, two impossible distances. Watch the slip." />
+<meta name="author" content="Priyanshu Gupta" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400;1,9..144,600&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+<style>
+/* ================================================================
+   ARISTOTLE'S WHEEL — PARADOX EXPLAINER
+   Author: Priyanshu Gupta
+   ----------------------------------------------------------------
+   Design System Tokens
+   ================================================================ */
+:root {
+  /* ─── Surface ─── */
+  --surface-primary:    #F5F3EE;
+  --surface-secondary:  #EDE9E0;
+  --surface-elevated:   #FBFAF6;
+
+  /* ─── Ink ─── */
+  --ink-primary:        #17191E;
+  --ink-60:             rgba(23, 25, 30, 0.62);
+  --ink-40:             rgba(23, 25, 30, 0.40);
+  --ink-20:             rgba(23, 25, 30, 0.20);
+
+  /* ─── Lines ─── */
+  --line-default:       rgba(23, 25, 30, 0.16);
+  --line-subtle:        rgba(23, 25, 30, 0.08);
+
+  /* ─── Accent Palette ─── */
+  --accent-copper:      #B3672B;
+  --accent-copper-deep: #8F4E1D;
+  --accent-copper-soft: rgba(179, 103, 43, 0.18);
+  --accent-lapis:       #2F5FA8;
+  --accent-lapis-soft:  rgba(47, 95, 168, 0.14);
+  --accent-vermilion:   #C63D1F;
+
+  /* ─── Dark Mode Surfaces ─── */
+  --dark-bg:            #101216;
+  --dark-ink:           #EDEAE3;
+  --dark-line:          rgba(237, 234, 227, 0.14);
+  --dark-copper:        #D18A4C;
+  --dark-lapis:         #84ABE2;
+  --dark-vermilion:     #E2643C;
+
+  /* ─── Typography ─── */
+  --font-serif:         "Fraunces", Georgia, serif;
+  --font-sans:          "Instrument Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:          "IBM Plex Mono", "SF Mono", Consolas, monospace;
+
+  /* ─── Layout ─── */
+  --header-height:      64px;
+  --ease-smooth:        cubic-bezier(0.22, 0.7, 0.24, 1);
+  --ease-out:           cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ================================================================
+   Reset & Base
+   ================================================================ */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--surface-primary);
+  color: var(--ink-primary);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--accent-copper);
+  color: var(--surface-primary);
+}
+
+/* Custom Scrollbar */
+body::-webkit-scrollbar { width: 10px; }
+body::-webkit-scrollbar-track { background: var(--surface-primary); }
+body::-webkit-scrollbar-thumb {
+  background: var(--ink-20);
+  border-radius: 6px;
+  transition: background 0.3s;
+}
+body::-webkit-scrollbar-thumb:hover { background: var(--ink-40); }
+
+/* ================================================================
+   Ambient Decorations
+   ================================================================ */
+.ambient {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ambient svg {
+  position: absolute;
+  right: -22vmin;
+  top: -18vmin;
+  width: 96vmin;
+  height: 96vmin;
+  opacity: 0.55;
+}
+
+.ambient .datum {
+  position: absolute;
+  left: 0; right: 0;
+  top: 31%;
+  height: 1px;
+  background: var(--line-subtle);
+}
+
+.ambient .spin {
+  transform-origin: 50% 50%;
+  animation: spin 140s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='140' height='140' filter='url(%23n)'/></svg>");
+}
+
+main, header, footer { position: relative; z-index: 1; }
+
+/* ================================================================
+   Header
+   ================================================================ */
+.site-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--header-height);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 clamp(18px, 4vw, 44px);
+  background: rgba(245, 243, 238, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line-default);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--ink-primary);
+}
+
+.brand .glyph {
+  width: 26px;
+  height: 26px;
+  transition: transform 0.8s var(--ease-smooth);
+}
+
+.brand:hover .glyph { transform: rotate(180deg); }
+
+.brand b {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 17px;
+  letter-spacing: 0.01em;
+}
+
+.brand span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  color: var(--ink-40);
+  margin-left: 2px;
+}
+
+.site-header nav {
+  display: flex;
+  gap: 26px;
+}
+
+.site-header nav a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  text-decoration: none;
+  position: relative;
+  padding: 4px 0;
+  transition: color 0.25s;
+}
+
+.site-header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0; bottom: 0;
+  height: 1px;
+  width: 0;
+  background: var(--accent-copper);
+  transition: width 0.3s var(--ease-smooth);
+}
+
+.site-header nav a:hover { color: var(--ink-primary); }
+.site-header nav a:hover::after { width: 100%; }
+
+.theta-live {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-60);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theta-live i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-copper);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50%      { opacity: 1;   transform: scale(1.15); }
+}
+
+.progress-bar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  height: 2px;
+  width: 0;
+  background: var(--accent-copper);
+  z-index: 51;
+  transition: width 0.1s linear;
+}
+
+/* ================================================================
+   Shared Layout Primitives
+   ================================================================ */
+.wrap {
+  max-width: 1260px;
+  margin: 0 auto;
+  padding: 0 clamp(18px, 4vw, 44px);
+}
+
+section {
+  padding: clamp(84px, 11vh, 140px) 0;
+  position: relative;
+}
+
+.sec-head {
+  display: flex;
+  align-items: baseline;
+  gap: 18px;
+  margin-bottom: 14px;
+}
+
+.sec-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent-copper);
+}
+
+.sec-rule { flex: 1; height: 1px; background: var(--line-default); }
+
+h2 {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(34px, 4.6vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin-bottom: 18px;
+}
+
+h2 em { font-style: italic; color: var(--accent-copper); }
+
+.lede {
+  max-width: 60ch;
+  color: var(--ink-60);
+  font-size: 18px;
+}
+
+.sec-num {
+  position: absolute;
+  top: clamp(40px, 6vh, 80px);
+  right: -10px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(120px, 22vw, 300px);
+  line-height: 1;
+  color: var(--ink-primary);
+  opacity: 0.045;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mono { font-family: var(--font-mono); }
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.9s var(--ease-smooth),
+    transform 0.9s var(--ease-smooth);
+  transition-delay: var(--delay, 0s);
+}
+
+[data-reveal].revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* Frame (canvas container) */
+.frame {
+  position: relative;
+  background: var(--surface-elevated);
+  border: 1px solid var(--line-default);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 24px 60px -30px rgba(23, 25, 30, 0.25);
+}
+
+.frame canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.corner {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.corner::before, .corner::after {
+  content: "";
+  position: absolute;
+  background: var(--ink-primary);
+}
+
+.corner::before { width: 14px; height: 1px; }
+.corner::after  { width: 1px;  height: 14px; }
+
+.corner.tl { top: 8px;    left: 8px; }
+.corner.tr { top: 8px;    right: 8px; transform: scaleX(-1); }
+.corner.bl { bottom: 8px; left: 8px;  transform: scaleY(-1); }
+.corner.br { bottom: 8px; right: 8px; transform: scale(-1); }
+
+figcaption {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+  margin-top: 12px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+figcaption::before {
+  content: "◆";
+  color: var(--accent-copper);
+  font-size: 8px;
+}
+
+/* ================================================================
+   Hero Section
+   ================================================================ */
+.hero {
+  min-height: 96vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-top: calc(var(--header-height) + 40px);
+  padding-bottom: 0;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(24px, 4vw, 60px);
+  align-items: end;
+  margin-bottom: clamp(24px, 4vh, 48px);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent-copper);
+  margin-bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.eyebrow::before {
+  content: "";
+  width: 34px;
+  height: 1px;
+  background: var(--accent-copper);
+}
+
+h1 {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(40px, 5.6vw, 76px);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  margin-bottom: 26px;
+}
+
+h1 em { font-style: italic; color: var(--accent-copper); }
+
+.hero .lede { margin-bottom: 30px; }
+
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  padding: 7px 13px;
+  border: 1px solid var(--line-default);
+  border-radius: 999px;
+  color: var(--ink-60);
+  background: var(--surface-elevated);
+  transition: all 0.3s var(--ease-smooth);
+}
+
+.chip:hover {
+  border-color: var(--accent-copper);
+  color: var(--accent-copper);
+  transform: translateY(-2px);
+}
+
+.chip b { color: var(--ink-primary); font-weight: 500; }
+.chip:hover b { color: var(--accent-copper); }
+
+.cue {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.22em;
+  color: var(--ink-40);
+  text-transform: uppercase;
+}
+
+.cue .line {
+  width: 1px;
+  height: 44px;
+  background: var(--line-default);
+  position: relative;
+  overflow: hidden;
+}
+
+.cue .line::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--accent-copper);
+  animation: drop 2.2s var(--ease-smooth) infinite;
+}
+
+@keyframes drop {
+  0%  { top: -100%; }
+  55% { top: 100%; }
+  100%{ top: 100%; }
+}
+
+.hero-frame { height: clamp(380px, 54vh, 600px); }
+
+.def-strip {
+  border-top: 1px solid var(--line-default);
+  margin-top: clamp(24px, 4vh, 48px);
+  padding: 16px 0 20px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-40);
+  display: flex;
+  gap: clamp(16px, 3vw, 44px);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.def-strip span b { color: var(--accent-copper); font-weight: 500; }
+
+/* ================================================================
+   Claim Section
+   ================================================================ */
+.claim-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(28px, 4vw, 64px);
+  align-items: center;
+  margin-top: 44px;
+}
+
+.claim-frame {
+  height: clamp(400px, 52vh, 520px);
+  cursor: pointer;
+}
+
+.claim-aside { padding: 8px 0; }
+
+.claim-aside h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(24px, 2.4vw, 32px);
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.claim-aside h3 em { font-style: italic; color: var(--accent-copper); }
+.claim-aside p     { color: var(--ink-60); margin-bottom: 16px; }
+
+.claim-aside .note {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--accent-copper);
+  border-left: 2px solid var(--accent-copper);
+  padding-left: 12px;
+}
+
+/* ================================================================
+   Instrument Section (Scrollytelling)
+   ================================================================ */
+.scrolly {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: clamp(20px, 3vw, 48px);
+  margin-top: 48px;
+}
+
+.stage-stick {
+  position: sticky;
+  top: calc(var(--header-height) + 20px);
+  align-self: start;
+}
+
+.stage-frame {
+  height: clamp(420px, calc(100vh - var(--header-height) - 90px), 740px);
+}
+
+.stage-frame canvas {
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.stage-frame canvas.grabbing { cursor: grabbing; }
+
+.hud {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-60);
+  background: rgba(251, 250, 246, 0.85);
+  border: 1px solid var(--line-default);
+  border-radius: 8px;
+  padding: 6px 10px;
+  pointer-events: none;
+}
+
+.legend {
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.legend span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-60);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: all 0.5s var(--ease-smooth);
+}
+
+.legend span i {
+  width: 14px;
+  height: 2px;
+  background: var(--accent-copper);
+}
+
+.legend span.l2 i { background: var(--accent-lapis); }
+.legend span.l3 i { background: var(--accent-vermilion); height: 3px; }
+
+.stage-frame[data-mode="2"] .l1,
+.stage-frame[data-mode="3"] .l1,
+.stage-frame[data-mode="2"] .l2,
+.stage-frame[data-mode="3"] .l2,
+.stage-frame[data-mode="3"] .l3 {
+  opacity: 1;
+  transform: none;
+}
+
+.drag-hint {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-40);
+  background: rgba(251, 250, 246, 0.85);
+  border: 1px solid var(--line-default);
+  border-radius: 999px;
+  padding: 7px 16px;
+  transition: opacity 0.6s;
+  pointer-events: none;
+}
+
+.drag-hint.hidden { opacity: 0; }
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(60px, 34vh, 340px);
+  padding: 22vh 0 30vh;
+}
+
+.step {
+  background: var(--surface-elevated);
+  border: 1px solid var(--line-default);
+  border-left: 2px solid var(--line-default);
+  border-radius: 12px;
+  padding: clamp(22px, 2.4vw, 34px);
+  transition: border-color 0.5s, box-shadow 0.5s, opacity 0.5s;
+  opacity: 0.5;
+}
+
+.step.active {
+  border-left-color: var(--accent-copper);
+  opacity: 1;
+  box-shadow: 0 24px 50px -34px rgba(23, 25, 30, 0.35);
+}
+
+.step .ph {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  color: var(--accent-copper);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.step h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(21px, 2vw, 27px);
+  line-height: 1.15;
+  margin-bottom: 12px;
+}
+
+.step p {
+  color: var(--ink-60);
+  font-size: 15.5px;
+  margin-bottom: 14px;
+}
+
+.step .watch {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  color: var(--ink-primary);
+  background: var(--surface-secondary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: inline-block;
+}
+
+/* ─── Bench Controls ─── */
+.bench {
+  margin-top: 26px;
+  background: var(--surface-elevated);
+  border: 1px solid var(--line-default);
+  border-radius: 14px;
+  padding: clamp(20px, 2.6vw, 32px);
+}
+
+.bench-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.bench-head .t {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+}
+
+.bench-head .r { flex: 1; height: 1px; background: var(--line-default); }
+
+.bench-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 22px 34px;
+  align-items: center;
+}
+
+.ctrl label {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+  margin-bottom: 10px;
+}
+
+.ctrl label output { color: var(--accent-copper); }
+
+input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 22px;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--line-default);
+  border-radius: 2px;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--surface-elevated);
+  border: 1.5px solid var(--ink-primary);
+  margin-top: -7px;
+  transition: transform 0.2s var(--ease-smooth), border-color 0.2s;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.25);
+  border-color: var(--accent-copper);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 2px;
+  background: var(--line-default);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--surface-elevated);
+  border: 1.5px solid var(--ink-primary);
+}
+
+.btn {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-primary);
+  background: transparent;
+  border: 1px solid var(--line-default);
+  border-radius: 10px;
+  padding: 11px 20px;
+  cursor: pointer;
+  transition: all 0.28s var(--ease-smooth);
+}
+
+.btn:hover {
+  background: var(--ink-primary);
+  color: var(--surface-primary);
+  border-color: var(--ink-primary);
+  transform: translateY(-2px);
+}
+
+.btn:active { transform: translateY(0) scale(0.98); }
+
+.btn.primary {
+  background: var(--ink-primary);
+  color: var(--surface-primary);
+}
+
+.btn.primary:hover {
+  background: var(--accent-copper-deep);
+  border-color: var(--accent-copper-deep);
+}
+
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.switches { display: flex; gap: 18px; flex-wrap: wrap; }
+
+.sw {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-60);
+}
+
+.sw input { display: none; }
+
+.sw .tr {
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1px solid var(--line-default);
+  background: var(--surface-secondary);
+  position: relative;
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.sw .tr::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--ink-primary);
+  transition: transform 0.3s var(--ease-smooth), background 0.3s;
+}
+
+.sw input:checked + .tr {
+  background: var(--accent-copper-soft);
+  border-color: var(--accent-copper);
+}
+
+.sw input:checked + .tr::after {
+  transform: translateX(14px);
+  background: var(--accent-copper);
+}
+
+/* ================================================================
+   Polygon Section (Dark Theme)
+   ================================================================ */
+.dark-section {
+  background: var(--dark-bg);
+  color: var(--dark-ink);
+}
+
+.dark-section .sec-rule { background: var(--dark-line); }
+.dark-section .lede     { color: rgba(237, 234, 227, 0.6); }
+.dark-section .sec-num  { color: var(--dark-ink); }
+.dark-section figcaption { color: rgba(237, 234, 227, 0.45); }
+.dark-section figcaption::before { background: var(--dark-copper); }
+
+.poly-frame {
+  background: #14161c;
+  border-color: var(--dark-line);
+  height: clamp(400px, 54vh, 560px);
+  margin-top: 44px;
+}
+
+.poly-frame .corner::before,
+.poly-frame .corner::after { background: var(--dark-ink); }
+
+.counters {
+  display: flex;
+  gap: clamp(20px, 4vw, 56px);
+  flex-wrap: wrap;
+  margin: 34px 0 14px;
+}
+
+.counter .v {
+  font-family: var(--font-serif);
+  font-weight: 300;
+  font-size: clamp(30px, 3.4vw, 46px);
+  line-height: 1;
+  color: var(--dark-copper);
+}
+
+.counter .v small {
+  font-size: 0.5em;
+  color: rgba(237, 234, 227, 0.5);
+}
+
+.counter .k {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(237, 234, 227, 0.45);
+  margin-top: 8px;
+}
+
+.poly-controls {
+  display: flex;
+  gap: 14px 22px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 22px;
+}
+
+.poly-controls input[type="range"] { width: min(300px, 60vw); }
+
+.poly-controls input[type="range"]::-webkit-slider-runnable-track {
+  background: var(--dark-line);
+}
+
+.poly-controls input[type="range"]::-webkit-slider-thumb {
+  background: #14161c;
+  border-color: var(--dark-ink);
+}
+
+.poly-controls input[type="range"]::-moz-range-thumb {
+  background: #14161c;
+  border-color: var(--dark-ink);
+}
+
+.nchip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(237, 234, 227, 0.65);
+  background: transparent;
+  border: 1px solid var(--dark-line);
+  border-radius: 999px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-smooth);
+}
+
+.nchip:hover {
+  border-color: var(--dark-copper);
+  color: var(--dark-copper);
+  transform: translateY(-2px);
+}
+
+.nchip.active {
+  background: var(--dark-copper);
+  border-color: var(--dark-copper);
+  color: var(--dark-bg);
+}
+
+.dark-section .btn {
+  color: var(--dark-ink);
+  border-color: var(--dark-line);
+}
+
+.dark-section .btn:hover {
+  background: var(--dark-ink);
+  color: var(--dark-bg);
+  border-color: var(--dark-ink);
+}
+
+.dark-section .btn.primary {
+  background: var(--dark-copper);
+  border-color: var(--dark-copper);
+  color: var(--dark-bg);
+}
+
+.dark-section .btn.primary:hover {
+  background: var(--dark-lapis);
+  border-color: var(--dark-lapis);
+}
+
+/* ================================================================
+   Resolution Ledger
+   ================================================================ */
+.ledger {
+  margin-top: 52px;
+  border-top: 1px solid var(--line-default);
+}
+
+.led-row {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: clamp(24px, 4vw, 70px);
+  padding: clamp(36px, 5vh, 58px) 0;
+  border-bottom: 1px solid var(--line-default);
+  align-items: center;
+  transition: background 0.5s;
+}
+
+.led-row:hover {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(179, 103, 43, 0.04),
+    transparent
+  );
+}
+
+.led-num {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(56px, 7vw, 96px);
+  line-height: 1;
+  color: var(--accent-copper);
+  transition: transform 0.5s var(--ease-smooth);
+}
+
+.led-row:hover .led-num { transform: translateX(10px); }
+
+.led-row h3 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(22px, 2.4vw, 30px);
+  margin-bottom: 12px;
+}
+
+.led-row p {
+  color: var(--ink-60);
+  font-size: 16px;
+  max-width: 56ch;
+}
+
+.led-row .formula {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--accent-copper);
+  margin-top: 14px;
+  display: block;
+}
+
+.diag {
+  width: 100%;
+  max-width: 340px;
+  justify-self: center;
+}
+
+.diag path, .diag circle, .diag line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.4s var(--ease-smooth) 0.25s;
+}
+
+.revealed .diag path,
+.revealed .diag circle,
+.revealed .diag line {
+  stroke-dashoffset: 0;
+}
+
+.diag text {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  opacity: 0;
+  transition: opacity 0.8s ease 1s;
+}
+
+.revealed .diag text { opacity: 1; }
+
+/* ================================================================
+   Timeline
+   ================================================================ */
+.timeline {
+  margin-top: 56px;
+  border-left: 1px solid var(--line-default);
+  padding-left: clamp(28px, 4vw, 56px);
+  position: relative;
+}
+
+.tl-item {
+  position: relative;
+  padding: 0 0 clamp(40px, 6vh, 64px);
+}
+
+.tl-item::before {
+  content: "◇";
+  position: absolute;
+  left: calc(-1 * clamp(28px, 4vw, 56px) - 9px);
+  top: 10px;
+  font-size: 14px;
+  color: var(--accent-copper);
+  transition: all 0.35s var(--ease-smooth);
+}
+
+.tl-item:hover::before {
+  color: var(--accent-copper);
+  transform: scale(1.4) rotate(45deg);
+  content: "◆";
+}
+
+.tl-year {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  color: var(--accent-copper);
+  margin-bottom: 8px;
+  transition: letter-spacing 0.4s var(--ease-smooth);
+}
+
+.tl-item:hover .tl-year { letter-spacing: 0.3em; }
+
+.tl-item h4 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(20px, 2.2vw, 27px);
+  margin-bottom: 8px;
+}
+
+.tl-item p {
+  color: var(--ink-60);
+  max-width: 64ch;
+  font-size: 15.5px;
+}
+
+/* ================================================================
+   Footer
+   ================================================================ */
+footer {
+  border-top: 1px solid var(--line-default);
+  padding: clamp(70px, 10vh, 110px) 0 46px;
+  text-align: center;
+}
+
+.telos {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--accent-copper);
+  text-transform: uppercase;
+  margin-bottom: 22px;
+}
+
+.fin {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 300;
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.15;
+  max-width: 22ch;
+  margin: 0 auto 26px;
+}
+
+.eq {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  color: var(--ink-40);
+  margin-bottom: 52px;
+}
+
+.eq b { color: var(--accent-copper); font-weight: 500; }
+
+.signature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  margin: 40px auto 30px;
+  padding: 30px 40px;
+  max-width: 480px;
+  border-top: 1px solid var(--line-default);
+  border-bottom: 1px solid var(--line-default);
+}
+
+.signature .ornament {
+  font-size: 14px;
+  color: var(--accent-copper);
+  letter-spacing: 0.6em;
+}
+
+.signature .author {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-size: clamp(22px, 2.8vw, 32px);
+  letter-spacing: 0.02em;
+}
+
+.signature .role {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.28em;
+  color: var(--ink-40);
+  text-transform: uppercase;
+}
+
+.colophon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-default);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  color: var(--ink-40);
+  text-transform: uppercase;
+}
+
+.fwheel {
+  width: 34px;
+  height: 34px;
+  transition: transform 1s var(--ease-smooth);
+}
+
+.colophon:hover .fwheel { transform: rotate(360deg); }
+
+/* ================================================================
+   Responsive
+   ================================================================ */
+@media (max-width: 980px) {
+  .hero-grid,
+  .claim-grid,
+  .scrolly {
+    grid-template-columns: 1fr;
+  }
+  .hero { min-height: auto; }
+  .hero-frame { height: 52vh; }
+  .stage-stick { position: sticky; top: var(--header-height); z-index: 5; }
+  .stage-frame {
+    height: 50vh;
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .steps { padding: 36px 0 10vh; gap: 60px; }
+  .led-row { grid-template-columns: 1fr; gap: 22px; }
+  .diag { justify-self: start; }
+  .site-header nav { display: none; }
+  .sec-num { font-size: 110px; opacity: 0.05; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  [data-reveal] { opacity: 1; transform: none; }
+  .diag path, .diag circle, .diag line { stroke-dashoffset: 0; }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     AMBIENT DECORATIONS
+     ═══════════════════════════════════════════════════════════ -->
+<div class="ambient" aria-hidden="true">
+  <div class="datum"></div>
+  <svg viewBox="0 0 100 100" fill="none">
+    <circle cx="50" cy="50" r="49" stroke="#17191E" stroke-opacity=".07" stroke-width=".3"/>
+    <circle cx="50" cy="50" r="30" stroke="#17191E" stroke-opacity=".07" stroke-width=".3"/>
+    <g class="spin"><circle cx="50" cy="50" r="40" stroke="#B3672B" stroke-opacity=".14" stroke-width=".3" stroke-dasharray="1.5 3"/></g>
+    <line x1="50" y1="0" x2="50" y2="100" stroke="#17191E" stroke-opacity=".05" stroke-width=".25"/>
+    <line x1="0" y1="50" x2="100" y2="50" stroke="#17191E" stroke-opacity=".05" stroke-width=".25"/>
+  </svg>
+</div>
+<div class="noise" aria-hidden="true"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HEADER
+     ═══════════════════════════════════════════════════════════ -->
+<header class="site-header">
+  <a class="brand" href="#top" aria-label="Aristotle's Wheel — top">
+    <svg class="glyph" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+      <circle cx="13" cy="13" r="11.5" stroke="#B3672B" stroke-width="1.6"/>
+      <circle cx="13" cy="13" r="6.5" stroke="#2F5FA8" stroke-width="1.3"/>
+      <circle cx="13" cy="13" r="1.6" fill="#17191E"/>
+    </svg>
+    <b>Aristotle's Wheel</b>
+    <span>MECHANICS</span>
+  </a>
+  <nav aria-label="Sections">
+    <a href="#claim">Claim</a>
+    <a href="#instrument">Instrument</a>
+    <a href="#polygon">Polygons</a>
+    <a href="#resolution">Resolution</a>
+    <a href="#history">Marginalia</a>
+  </nav>
+  <div class="theta-live" aria-hidden="true">
+    <i></i>
+    <span id="liveTheta">θ 000.0°</span>
+  </div>
+</header>
+
+<div class="progress-bar" id="progress"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN CONTENT
+     ═══════════════════════════════════════════════════════════ -->
+<main id="top">
+
+  <!-- ═══════════════ OPENING ═══════════════ -->
+  <section class="hero" id="heroSec">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow">Mechanics · Problem XXIV · c. 300 BCE</div>
+        <h1 data-reveal>The smaller circle should fall behind. <em>It never does.</em></h1>
+        <p class="lede" data-reveal style="--delay:.12s">
+          Bind a small circle inside a greater one and roll the pair through a single turn:
+          both sweep the same road, though their edges disagree by <code>2π(R−r)</code>.
+          Aristotle noticed. Twenty-three centuries of geometers argued.
+          This page rolls the thing out in front of you.
+        </p>
+        <div class="meta-row" data-reveal style="--delay:.22s">
+          <span class="chip"><b>R</b> — outer radius</span>
+          <span class="chip"><b>r</b> — inner radius</span>
+          <span class="chip"><b>Δ</b> = 2π(R−r)</span>
+        </div>
+        <div class="cue" data-reveal style="--delay:.3s">
+          <span class="line"></span> scroll to unwind
+        </div>
+      </div>
+      <div data-reveal style="--delay:.15s">
+        <div class="frame hero-frame">
+          <span class="corner tl"></span>
+          <span class="corner tr"></span>
+          <span class="corner bl"></span>
+          <span class="corner br"></span>
+          <canvas id="heroCanvas" aria-label="Animation of Aristotle's wheel rolling, drawing a cycloid and a curtate cycloid"></canvas>
+        </div>
+        <figcaption>fig. 00 · the wheel, rolling east — copper: the greater edge · lapis: the lesser edge</figcaption>
+      </div>
+    </div>
+    <div class="def-strip">
+      <span>x = <b>Rθ</b> — the road obeys the outer circle</span>
+      <span>v<sub>slip</sub> = <b>(R−r)·ω</b> — what the inner one pays</span>
+      <span>2πR = 2πr + <b>2π(R−r)</b> — the accounting</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════ §01 THE CLAIM ═══════════════ -->
+  <section id="claim">
+    <span class="sec-num" aria-hidden="true">§01</span>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">◈ §01 — The Claim</span>
+        <span class="sec-rule"></span>
+      </div>
+      <h2 data-reveal>The same road, <em>two edges.</em></h2>
+      <div class="claim-grid">
+        <div data-reveal>
+          <div class="frame claim-frame" id="claimFrame">
+            <span class="corner tl"></span>
+            <span class="corner tr"></span>
+            <span class="corner bl"></span>
+            <span class="corner br"></span>
+            <canvas id="claimCanvas" aria-label="One revolution unrolled: the outer edge fills the road, the inner edge falls short"></canvas>
+          </div>
+          <figcaption>fig. 01 · one revolution, unrolled — click to replay</figcaption>
+        </div>
+        <aside class="claim-aside" data-reveal style="--delay:.15s">
+          <h3>Roll exactly one turn. Mark the road at departure and arrival.</h3>
+          <p>
+            The outer circle, unrolled edge-first, fills that span to the millimetre —
+            that is what circumference means.
+          </p>
+          <p>
+            The inner circle, unrolled beside it, falls short. And yet,
+            <em>while riding</em>, it crossed every point of the very same span.
+            Two unequal edges, one road, no remainder.
+          </p>
+          <p class="note">The absurdity — so the Mechanica leaves it.</p>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ §02 THE INSTRUMENT ═══════════════ -->
+  <section id="instrument">
+    <span class="sec-num" aria-hidden="true">§02</span>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">◈ §02 — The Instrument</span>
+        <span class="sec-rule"></span>
+      </div>
+      <h2 data-reveal>Read the wheel, <em>slowly.</em></h2>
+      <p class="lede" data-reveal style="--delay:.1s">
+        Four phases, one axle. Scroll and the instrument obeys; grab the wheel and it obeys you.
+      </p>
+
+      <div class="scrolly">
+        <div class="stage-stick">
+          <div class="frame stage-frame" id="stageFrame" data-mode="0">
+            <span class="corner tl"></span>
+            <span class="corner tr"></span>
+            <span class="corner bl"></span>
+            <span class="corner br"></span>
+            <canvas id="stageCanvas" aria-label="Interactive rolling wheel with traces, slip vector and measurements"></canvas>
+            <div class="hud" id="stageHud">θ 000.0° · x/R 0.00</div>
+            <div class="legend" aria-hidden="true">
+              <span class="l1"><i></i>cycloid — outer edge</span>
+              <span class="l2"><i></i>curtate cycloid — inner edge</span>
+              <span class="l3"><i></i>slip, distributed</span>
+            </div>
+            <div class="drag-hint" id="dragHint">⌬ drag the wheel — or let it roll</div>
+          </div>
+        </div>
+        <div class="steps">
+          <article class="step" data-step="0">
+            <span class="ph">Phase 01 · Construction</span>
+            <h3>One axle, two circles.</h3>
+            <p>
+              Fix two circles, concentric, on a single axle. Call the outer radius <b>R</b>
+              and the inner <b>r</b>. One body — but two edges, and soon, two stories.
+            </p>
+            <span class="watch">watch — the dimensions R and r</span>
+          </article>
+          <article class="step" data-step="1">
+            <span class="ph">Phase 02 · Contact</span>
+            <h3>The road belongs to the greater.</h3>
+            <p>
+              Set the wheel down: only the outer circle touches. Its contact point is
+              instantaneously at rest — that is the whole definition of pure rolling,
+              and it fixes the pace: <code>x = Rθ</code>. Everything else on the axle is a passenger.
+            </p>
+            <span class="watch">watch — the copper contact point, always still</span>
+          </article>
+          <article class="step" data-step="2">
+            <span class="ph">Phase 03 · The Passenger</span>
+            <h3>The lesser circle rides; it does not roll.</h3>
+            <p>
+              The inner point draws a curtate cycloid — a flattened wave. Its lowest point
+              never stops moving: it slides forward at <code>(R−r)ω</code>. Motion where contact
+              ought to be still is slip, by definition.
+            </p>
+            <span class="watch">watch — the vermilion slip vector, riding along</span>
+          </article>
+          <article class="step" data-step="3">
+            <span class="ph">Phase 04 · Accounting</span>
+            <h3>The missing length hides in plain sight.</h3>
+            <p>
+              Per revolution both circles sweep the same span <code>2πR</code> — but the inner edge
+              pays only <code>2πr</code>. The shortfall <code>2π(R−r)</code> is not lost; it is smeared
+              across the whole span as slip. Aristotle saw two equal lines. Galileo saw
+              that one of them is mostly emptiness.
+            </p>
+            <span class="watch">watch — the measurement ledger, bottom left</span>
+          </article>
+        </div>
+      </div>
+
+      <!-- ─── Bench Controls ─── -->
+      <div class="bench" data-reveal>
+        <div class="bench-head">
+          <span class="t">⊕ The Bench — Tune the Wheel</span>
+          <span class="r"></span>
+        </div>
+        <div class="bench-grid">
+          <div class="btn-row">
+            <button class="btn primary" id="stPlay" aria-pressed="true">❚❚ Pause</button>
+            <button class="btn" id="stReset">↺ Reset</button>
+          </div>
+          <div class="ctrl">
+            <label>inner radius r / R <output id="ratioOut">0.62</output></label>
+            <input type="range" id="ratio" min="0.35" max="0.92" step="0.01" value="0.62" aria-label="Inner radius ratio"/>
+          </div>
+          <div class="ctrl">
+            <label>rolling speed <output id="speedOut">1.0×</output></label>
+            <input type="range" id="speed" min="0.2" max="2.2" step="0.1" value="1" aria-label="Rolling speed"/>
+          </div>
+          <div class="switches">
+            <label class="sw">
+              <input type="checkbox" id="swTraces" checked/>
+              <span class="tr"></span> traces
+            </label>
+            <label class="sw">
+              <input type="checkbox" id="swSlip" checked/>
+              <span class="tr"></span> slip vector
+            </label>
+            <label class="sw">
+              <input type="checkbox" id="swMeas" checked/>
+              <span class="tr"></span> ledger
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ §03 GALILEO'S POLYGONS ═══════════════ -->
+  <section id="polygon" class="dark-section">
+    <span class="sec-num" aria-hidden="true">§03</span>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag" style="color: var(--dark-copper)">◈ §03 — Polygonize It</span>
+        <span class="sec-rule"></span>
+      </div>
+      <h2 data-reveal>Galileo's <em style="color: var(--dark-copper)">sharp wheel.</em></h2>
+      <p class="lede" data-reveal style="--delay:.1s">
+        In 1638 Galileo replaced the smooth circles with nested polygons —
+        and the slip grew corners you can see. Every lurch leaves a visible void
+        in the lesser wheel's line. Multiply the sides: the clunks soften to a glide,
+        the voids multiply without bound and shrink beyond sight. His answer:
+        the small circle equals the great line only because it is riddled with
+        infinitely many empty points.
+      </p>
+
+      <div class="counters" data-reveal>
+        <div class="counter">
+          <div class="v" id="cnSides">6</div>
+          <div class="k">sides · n</div>
+        </div>
+        <div class="counter">
+          <div class="v" id="cnVoids">6</div>
+          <div class="k">voids per turn</div>
+        </div>
+        <div class="counter">
+          <div class="v"><span id="cnShare">38</span><small>%</small></div>
+          <div class="k">share of the line that is void</div>
+        </div>
+        <div class="counter">
+          <div class="v" id="cnStep">1.00<small>·R</small></div>
+          <div class="k">stride per lurch · s</div>
+        </div>
+      </div>
+
+      <div data-reveal>
+        <div class="frame poly-frame">
+          <span class="corner tl"></span>
+          <span class="corner tr"></span>
+          <span class="corner bl"></span>
+          <span class="corner br"></span>
+          <canvas id="polyCanvas" aria-label="Galileo's nested polygons rolling with visible voids, adjustable number of sides"></canvas>
+        </div>
+        <figcaption>fig. 03 · the printed line of the lesser wheel — arcs laid down, voids left behind</figcaption>
+      </div>
+
+      <div class="poly-controls" data-reveal>
+        <button class="btn primary" id="plPlay" aria-pressed="true">❚❚ Pause</button>
+        <div class="ctrl" style="min-width: 220px">
+          <label>sides <output id="nOut">6</output></label>
+          <input type="range" id="nSides" min="3" max="48" step="1" value="6" aria-label="Number of polygon sides"/>
+        </div>
+        <span class="nchip" data-n="3">3</span>
+        <span class="nchip" data-n="6">6</span>
+        <span class="nchip" data-n="12">12</span>
+        <span class="nchip" data-n="24">24</span>
+        <span class="nchip" data-n="inf">∞</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ §04 RESOLUTION ═══════════════ -->
+  <section id="resolution">
+    <span class="sec-num" aria-hidden="true">§04</span>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">◈ §04 — The Resolution</span>
+        <span class="sec-rule"></span>
+      </div>
+      <h2 data-reveal>Three constraints <em>dissolve it.</em></h2>
+
+      <div class="ledger">
+
+        <!-- ─── Constraint I ─── -->
+        <div class="led-row" data-reveal>
+          <div style="display: flex; align-items: center; gap: clamp(18px, 3vw, 40px)">
+            <div class="led-num">i</div>
+            <svg class="diag" viewBox="0 0 200 130" fill="none" aria-hidden="true">
+              <line x1="10" y1="105" x2="190" y2="105" stroke="#17191E" stroke-width="1.2" pathLength="1"/>
+              <circle cx="100" cy="55" r="49" stroke="#B3672B" stroke-width="1.8" pathLength="1"/>
+              <circle cx="100" cy="55" r="26" stroke="#2F5FA8" stroke-width="1.4" pathLength="1"/>
+              <circle cx="100" cy="104" r="3.4" fill="#B3672B" stroke="none"/>
+              <text x="112" y="118" fill="#B3672B">v = 0 — pinned</text>
+            </svg>
+          </div>
+          <div>
+            <h3>One road, one master.</h3>
+            <p>
+              The ground touches the outer circle alone, and at that point the wheel is
+              instantaneously still. A single kinematic constraint sets the pace of the
+              entire body — the inner circle never negotiates with the road at all.
+            </p>
+            <span class="formula">x = Rθ · nothing else decides the distance</span>
+          </div>
+        </div>
+
+        <!-- ─── Constraint II ─── -->
+        <div class="led-row" data-reveal>
+          <div style="display: flex; align-items: center; gap: clamp(18px, 3vw, 40px)">
+            <div class="led-num">ii</div>
+            <svg class="diag" viewBox="0 0 200 130" fill="none" aria-hidden="true">
+              <line x1="10" y1="105" x2="190" y2="105" stroke="#17191E" stroke-width="1.2" pathLength="1"/>
+              <circle cx="86" cy="55" r="49" stroke="#B3672B" stroke-width="1.8" pathLength="1"/>
+              <circle cx="86" cy="55" r="27" stroke="#2F5FA8" stroke-width="1.4" pathLength="1"/>
+              <circle cx="86" cy="82" r="3.2" fill="#2F5FA8" stroke="none"/>
+              <line x1="89" y1="82" x2="150" y2="82" stroke="#C63D1F" stroke-width="2.2" pathLength="1"/>
+              <path d="M150 82 l-8 -4.5 v9 z" fill="#C63D1F" stroke="none"/>
+              <text x="100" y="70" fill="#C63D1F">v = (R−r)ω</text>
+            </svg>
+          </div>
+          <div>
+            <h3>The passenger slides.</h3>
+            <p>
+              Carried at Rω by the axle, spun backward at rω by the rotation, the inner
+              circle's lowest point still creeps forward at (R−r)ω. If it had its own
+              road, it would skid along it — continuously, silently, for the whole journey.
+            </p>
+            <span class="formula">v<sub>contact</sub> = Rω − rω = (R−r)ω ≠ 0 → slip</span>
+          </div>
+        </div>
+
+        <!-- ─── Constraint III ─── -->
+        <div class="led-row" data-reveal>
+          <div style="display: flex; align-items: center; gap: clamp(18px, 3vw, 40px)">
+            <div class="led-num">iii</div>
+            <svg class="diag" viewBox="0 0 200 130" fill="none" aria-hidden="true">
+              <line x1="10" y1="60" x2="190" y2="60" stroke="#B3672B" stroke-width="2.2" pathLength="1"/>
+              <g stroke="#C63D1F" stroke-width="1.4">
+                <line x1="34"  y1="52" x2="40"  y2="68" pathLength="1"/>
+                <line x1="58"  y1="52" x2="64"  y2="68" pathLength="1"/>
+                <line x1="82"  y1="52" x2="88"  y2="68" pathLength="1"/>
+                <line x1="106" y1="52" x2="112" y2="68" pathLength="1"/>
+                <line x1="130" y1="52" x2="136" y2="68" pathLength="1"/>
+                <line x1="154" y1="52" x2="160" y2="68" pathLength="1"/>
+              </g>
+              <text x="40" y="92" fill="#17191E" opacity=".6">equal span — unequal content</text>
+            </svg>
+          </div>
+          <div>
+            <h3>Equal lengths, unequal contents.</h3>
+            <p>
+              The lesser circle truly does traverse the greater line — but not by rolling
+              alone: its own 2πr of edge, plus 2π(R−r) of distributed slip. Galileo phrased
+              it as arcs and voids, three centuries before measure theory would shrug and
+              confirm him: length is blind to holes of measure zero.
+            </p>
+            <span class="formula">2πR = 2πr + 2π(R−r) · full line = edge + voids</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════ §05 MARGINALIA ═══════════════ -->
+  <section id="history">
+    <span class="sec-num" aria-hidden="true">§05</span>
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="sec-tag">◈ §05 — Marginalia</span>
+        <span class="sec-rule"></span>
+      </div>
+      <h2 data-reveal>Readers across <em>twenty-three centuries.</em></h2>
+      <div class="timeline">
+        <div class="tl-item" data-reveal>
+          <div class="tl-year">c. 300 BCE</div>
+          <h4>Mechanica — Problem 24</h4>
+          <p>
+            The puzzle enters the record in the Aristotelian corpus (likely Straton's hand):
+            when the wheel moves, the inner circle seems to traverse a path equal to the
+            outer — how? It is posed, puzzled over, and left standing.
+          </p>
+        </div>
+        <div class="tl-item" data-reveal style="--delay:.06s">
+          <div class="tl-year">1638</div>
+          <h4>Galileo — Two New Sciences</h4>
+          <p>
+            Galileo swaps circles for nested polygons, counts the gaps, and dares the limit:
+            the smaller circle's line equals the greater's only because it is full of
+            "infinitely many voids." Infinity, handled without flinching.
+          </p>
+        </div>
+        <div class="tl-item" data-reveal style="--delay:.12s">
+          <div class="tl-year">1639 – 1658</div>
+          <h4>The Cycloid Wars</h4>
+          <p>
+            Roberval names the curve traced by the outer point; Mersenne mails challenges
+            across Europe; Torricelli, Pascal and Wallis answer. The humble trace of
+            Aristotle's wheel becomes the most contested curve in mathematics.
+          </p>
+        </div>
+        <div class="tl-item" data-reveal style="--delay:.18s">
+          <div class="tl-year">1659</div>
+          <h4>Huygens Bends the Curve</h4>
+          <p>
+            Huygens hangs a pendulum between cycloidal cheeks so a clock beats truly.
+            The paradox's byproduct becomes engineering — rolling curves now keep time.
+          </p>
+        </div>
+        <div class="tl-item" data-reveal style="--delay:.24s">
+          <div class="tl-year">Today</div>
+          <h4>Kinematics Settles It</h4>
+          <p>
+            Rolling is a velocity condition: the contact point must be instantaneously still.
+            Only the outer circle satisfies it; the inner slips at (R−r)ω. The paradox
+            was never about geometry alone — it was a dynamics problem wearing a
+            geometry costume.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <div class="telos">Q.E.D. · Quod Erat Demonstrandum</div>
+    <p class="fin">The wheel is reconciled: equal roads, unequal rolling.</p>
+    <p class="eq">
+      x = <b>Rθ</b> &nbsp;·&nbsp;
+      v<sub>slip</sub> = <b>(R−r)ω</b> &nbsp;·&nbsp;
+      2πR = 2πr + <b>2π(R−r)</b>
+    </p>
+
+    <!-- ─── Author Signature ─── -->
+    <div class="signature">
+      <span class="ornament">✧ ✧ ✧</span>
+      <span class="author">Priyanshu Gupta</span>
+      <span class="role">⟡ Designer & Developer ⟡</span>
+    </div>
+
+    <div class="colophon">
+      <span>Aristotle's Wheel — A Paradox Explainer</span>
+      <svg class="fwheel" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+        <circle cx="17" cy="17" r="15" stroke="#B3672B" stroke-width="1.6"/>
+        <circle cx="17" cy="17" r="8.4" stroke="#2F5FA8" stroke-width="1.3"/>
+        <line x1="17" y1="2"  x2="17" y2="32" stroke="#17191E" stroke-opacity=".35" stroke-width="1"/>
+        <line x1="2"  y1="17" x2="32" y2="17" stroke="#17191E" stroke-opacity=".35" stroke-width="1"/>
+        <circle cx="17" cy="17" r="1.8" fill="#17191E"/>
+      </svg>
+      <span>© 2026 · Priyanshu Gupta</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════
+     JAVASCRIPT APPLICATION
+     ═══════════════════════════════════════════════════════════ -->
+<script>
+/**
+ * =====================================================================
+ * ARISTOTLE'S WHEEL — PARADOX EXPLAINER
+ * =====================================================================
+ * Author:      Priyanshu Gupta
+ * Description: Interactive exploration of the Aristotle's wheel paradox
+ *              with canvas-based rendering, scrollytelling, and Galileo's
+ *              polygon limit demonstration.
+ * =====================================================================
+ */
+
+(function App() {
+  'use strict';
+
+  /* =================================================================
+     §1 — CONSTANTS & CONFIGURATION
+     ================================================================= */
+  const TAU = Math.PI * 2;
+  const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /** Utility functions */
+  const Utils = {
+    clamp: (v, a, b) => Math.max(a, Math.min(b, v)),
+    lerp:  (a, b, t) => a + (b - a) * t,
+  };
+
+  /** Light theme palette */
+  const LIGHT_PAL = Object.freeze({
+    paper:      '#F5F3EE',
+    panel:      '#FBFAF6',
+    ink:        '#17191E',
+    ink60:      'rgba(23, 25, 30, 0.6)',
+    line:       'rgba(23, 25, 30, 0.16)',
+    copper:     '#B3672B',
+    copperDeep:'#8F4E1D',
+    lapis:      '#2F5FA8',
+    verm:       '#C63D1F',
+  });
+
+  /** Dark theme palette */
+  const DARK_PAL = Object.freeze({
+    bg:         '#14161c',
+    ink:        '#EDEAE3',
+    ink60:      'rgba(237, 234, 227, 0.62)',
+    line:       'rgba(237, 234, 227, 0.16)',
+    copper:     '#D18A4C',
+    copperDeep:'#B06F35',
+    lapis:      '#84ABE2',
+    verm:       '#E2643C',
+  });
+
+  /** Global application state */
+  const State = {
+    innerRatio: 0.62,        // r / R
+    speed: 1.0,
+    visibility: { hero: false, claim: false, inst: false, poly: false },
+  };
+
+  /* =================================================================
+     §2 — CANVAS FACTORY
+     ================================================================= */
+  class CanvasManager {
+    constructor(element) {
+      this.el = element;
+      this.ctx = element.getContext('2d');
+      this.state = { w: 0, h: 0 };
+      this._init();
+    }
+
+    _init() {
+      const resize = () => {
+        const rect = this.el.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        this.el.width  = Math.max(1, Math.round(rect.width * dpr));
+        this.el.height = Math.max(1, Math.round(rect.height * dpr));
+        this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        this.state.w = rect.width;
+        this.state.h = rect.height;
+      };
+      new ResizeObserver(resize).observe(this.el);
+      resize();
+    }
+  }
+
+  /** Typography helpers */
+  const Font = {
+    mono:  (px) => `500 ${px}px "IBM Plex Mono", monospace`,
+    serif: (px, italic = false) =>
+      `${italic ? 'italic ' : ''}300 ${px}px "Fraunces", serif`,
+  };
+
+  /* =================================================================
+     §3 — WHEEL RENDERER (shared: hero / stage / poly-∞)
+     ================================================================= */
+  function renderWheel(ctx, W, H, opts) {
+    const P = opts.palette || LIGHT_PAL;
+    const { theta, K: k, R, cx, gy } = opts;
+    const r = R * k;
+    const cy = gy - R;
+
+    ctx.clearRect(0, 0, W, H);
+    if (P === DARK_PAL) {
+      ctx.fillStyle = DARK_PAL.bg;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // ─── Road + Ticks ───
+    ctx.strokeStyle = P.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, gy);
+    ctx.lineTo(W, gy);
+    ctx.stroke();
+
+    const step = TAU * R / 8;
+    const wmin = R * theta - cx;
+    const wmax = R * theta + (W - cx);
+    ctx.strokeStyle = P.line;
+    for (let q = Math.ceil(wmin / step); q <= Math.floor(wmax / step); q++) {
+      const sx = cx + q * step - R * theta;
+      ctx.beginPath();
+      ctx.moveTo(sx, gy);
+      ctx.lineTo(sx, gy + 7);
+      ctx.stroke();
+    }
+
+    // ─── Traces ───
+    if (opts.traces) {
+      const age = opts.age || TAU * 1.4;
+      const from = Math.max(opts.from ?? -Infinity, theta - age);
+      const N = 200;
+      const dth = (theta - from) / N;
+
+      for (let curve = 0; curve < 2; curve++) {
+        const rad = curve ? r : R;
+        const col = curve ? P.lapis : P.copper;
+        ctx.lineWidth = curve ? 2 : 2.4;
+        ctx.lineCap = 'round';
+        const chunks = 26;
+
+        for (let c = 0; c < chunks; c++) {
+          const a0 = Math.floor(N * c / chunks);
+          const a1 = Math.floor(N * (c + 1) / chunks);
+          const mid = from + dth * (a0 + a1) / 2;
+          const alpha = Math.pow(Utils.clamp(1 - (theta - mid) / age, 0, 1), 1.25)
+                        * (curve ? 0.95 : 1);
+          if (alpha <= 0.01) continue;
+
+          ctx.strokeStyle = col;
+          ctx.globalAlpha = alpha;
+          ctx.beginPath();
+          for (let i = a0; i <= a1; i++) {
+            const ph = from + dth * i;
+            const x = cx + R * (ph - theta) - rad * Math.sin(ph);
+            const y = gy - R + rad * Math.cos(ph);
+            i === a0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+        ctx.globalAlpha = 1;
+      }
+    }
+
+    // ─── Revolution Brackets + Distributed Slip Hatch ───
+    if (opts.brackets) {
+      const k0 = Math.max(1, Math.ceil(wmin / (TAU * R)));
+      const k1 = Math.floor(wmax / (TAU * R));
+      ctx.font = Font.mono(10);
+      ctx.textAlign = 'center';
+
+      for (let j = k0; j <= k1; j++) {
+        const x1 = cx + (j - 1) * TAU * R - R * theta;
+        const x2 = cx + j * TAU * R - R * theta;
+        const fade = Utils.clamp(1 - (R * theta - x2) / (TAU * R * 1.6), 0, 1);
+        ctx.globalAlpha = 0.8 * fade;
+        ctx.strokeStyle = P.copper;
+        ctx.lineWidth = 1;
+        const by = gy + 24;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, by); ctx.lineTo(x2, by);
+        ctx.moveTo(x1, by - 5); ctx.lineTo(x1, by + 5);
+        ctx.moveTo(x2, by - 5); ctx.lineTo(x2, by + 5);
+        ctx.stroke();
+        ctx.fillStyle = P.copper;
+        ctx.fillText('2πR', (x1 + x2) / 2, by + 18);
+
+        if (opts.hatch) {
+          ctx.strokeStyle = P.verm;
+          ctx.globalAlpha = 0.4 * fade;
+          for (let hx = x1 + 6; hx < x2 - 4; hx += 9) {
+            ctx.beginPath();
+            ctx.moveTo(hx, gy + 14);
+            ctx.lineTo(hx + 6, gy + 4);
+            ctx.stroke();
+          }
+        }
+        ctx.globalAlpha = 1;
+      }
+      ctx.textAlign = 'left';
+    }
+
+    // ─── Dimensions (Phase 0) ───
+    if (opts.dims) {
+      const drawDim = (ang, rad, col, label) => {
+        const ux = Math.cos(ang), uy = Math.sin(ang);
+        const x1 = cx + ux * 10, y1 = cy + uy * 10;
+        const x2 = cx + ux * rad, y2 = cy + uy * rad;
+        ctx.strokeStyle = col;
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.moveTo(x2 - uy * 5, y2 + ux * 5);
+        ctx.lineTo(x2 + uy * 5, y2 - ux * 5);
+        ctx.stroke();
+        ctx.font = Font.mono(11);
+        ctx.fillStyle = col;
+        ctx.fillText(label, cx + ux * rad * 0.55 - uy * 14, cy + uy * rad * 0.55 + ux * 14);
+      };
+      ctx.globalAlpha = 0.9;
+      drawDim(-0.72, R, P.copper, 'R');
+      drawDim(Math.PI + 0.55, r, P.lapis, 'r');
+      ctx.strokeStyle = P.line;
+      ctx.beginPath();
+      ctx.moveTo(cx - 7, cy); ctx.lineTo(cx + 7, cy);
+      ctx.moveTo(cx, cy - 7); ctx.lineTo(cx, cy + 7);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // ─── Wheel Body (Spokes) ───
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = P === DARK_PAL ? 'rgba(237, 234, 227, 0.2)' : 'rgba(23, 25, 30, 0.24)';
+    for (let i = 0; i < 8; i++) {
+      const a = theta + i * Math.PI / 4;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + Math.cos(a) * R * 0.96, cy + Math.sin(a) * R * 0.96);
+      ctx.stroke();
+    }
+
+    // ─── Outer Rim (copper) ───
+    ctx.lineWidth = 2.4;
+    ctx.strokeStyle = P.copper;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, TAU);
+    ctx.stroke();
+
+    // ─── Inner Rim (lapis) ───
+    ctx.lineWidth = 1.8;
+    ctx.strokeStyle = P.lapis;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, TAU);
+    ctx.stroke();
+
+    // ─── Axle ───
+    ctx.fillStyle = P.ink;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 3.2, 0, TAU);
+    ctx.fill();
+
+    // ─── Rim Markers ───
+    const mx = cx - R * Math.sin(theta);
+    const my = cy + R * Math.cos(theta);
+    ctx.fillStyle = P.copper;
+    ctx.beginPath();
+    ctx.arc(mx, my, 4, 0, TAU);
+    ctx.fill();
+
+    const ix = cx - r * Math.sin(theta);
+    const iy = cy + r * Math.cos(theta);
+    ctx.fillStyle = P.lapis;
+    ctx.beginPath();
+    ctx.arc(ix, iy, 3.4, 0, TAU);
+    ctx.fill();
+
+    // ─── Contact Pulse ───
+    if (opts.pulse) {
+      ctx.fillStyle = P.copper;
+      ctx.beginPath();
+      ctx.arc(cx, gy, 3.4, 0, TAU);
+      ctx.fill();
+      const t = (performance.now() / 1400) % 1;
+      ctx.strokeStyle = P.copper;
+      ctx.globalAlpha = (1 - t) * 0.5;
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.arc(cx, gy, 4 + t * 20, 0, TAU);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // ─── Slip Vector ───
+    if (opts.slip) {
+      const bx = cx, by = cy + r;
+      const len = (1 - k) * R * 0.95;
+      ctx.strokeStyle = P.verm;
+      ctx.fillStyle = P.verm;
+      ctx.lineWidth = 2.2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(bx, by);
+      ctx.lineTo(bx + len, by);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(bx + len + 7, by);
+      ctx.lineTo(bx + len - 2, by - 4.5);
+      ctx.lineTo(bx + len - 2, by + 4.5);
+      ctx.closePath();
+      ctx.fill();
+      ctx.font = Font.mono(10);
+      ctx.fillText('v = (R−r)ω', bx, by - 9);
+    }
+
+    // ─── Measurement Ledger Panel ───
+    if (opts.panel) {
+      const pw = 250, ph = 86, px = 16, py = H - ph - 16;
+      ctx.fillStyle = P === DARK_PAL
+        ? 'rgba(20, 22, 28, 0.92)'
+        : 'rgba(251, 250, 246, 0.94)';
+      ctx.strokeStyle = P.line;
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(px, py, pw, ph, 10);
+      else ctx.rect(px, py, pw, ph);
+      ctx.fill();
+      ctx.stroke();
+
+      const bx0 = px + 14, bw = 180;
+      ctx.font = Font.mono(9.5);
+      ctx.fillStyle = P.ink60;
+      ctx.fillText('ONE TURN · THE LEDGER', bx0, py + 18);
+      ctx.fillStyle = P.copper;
+      ctx.fillRect(bx0, py + 28, bw, 6);
+      ctx.fillStyle = P.ink60;
+      ctx.fillText('2πR — span swept', bx0 + bw + 8, py + 35);
+      ctx.fillStyle = P.lapis;
+      ctx.fillRect(bx0, py + 46, bw * k, 6);
+      ctx.fillStyle = P.ink60;
+      ctx.fillText('2πr — edge paid', bx0 + bw + 8, py + 53);
+
+      ctx.strokeStyle = P.verm;
+      ctx.lineWidth = 1.2;
+      for (let hx = bx0 + bw * k + 3; hx < bx0 + bw - 2; hx += 6) {
+        ctx.beginPath();
+        ctx.moveTo(hx, py + 52);
+        ctx.lineTo(hx + 4, py + 44);
+        ctx.stroke();
+      }
+      ctx.fillStyle = P.verm;
+      ctx.fillText('Δ = 2π(R−r) slip', bx0 + bw + 8, py + 71);
+    }
+  }
+
+  /* =================================================================
+     §4 — HERO SECTION
+     ================================================================= */
+  const heroCanvas = new CanvasManager(document.getElementById('heroCanvas'));
+  let heroTheta = REDUCED_MOTION ? 4.6 : 0;
+  const liveThetaEl = document.getElementById('liveTheta');
+
+  function drawHero() {
+    const { ctx, state } = heroCanvas;
+    const R = Math.min(state.h * 0.33, state.w * 0.15);
+    renderWheel(ctx, state.w, state.h, {
+      theta: heroTheta,
+      K: State.innerRatio,
+      R, cx: state.w * 0.62, gy: state.h * 0.74,
+      traces: true, pulse: true, brackets: true,
+      age: TAU * 1.3, from: -Infinity,
+    });
+    const deg = (heroTheta * 180 / Math.PI) % 360;
+    liveThetaEl.textContent = 'θ ' + deg.toFixed(1).padStart(5, '0') + '°';
+  }
+  if (REDUCED_MOTION) drawHero();
+
+  /* =================================================================
+     §5 — CLAIM SECTION (one revolution, unrolled)
+     ================================================================= */
+  const claimCanvas = new CanvasManager(document.getElementById('claimCanvas'));
+  let claimTime = REDUCED_MOTION ? 1 : 0;
+
+  function drawClaim(progress) {
+    const { ctx, state } = claimCanvas;
+    const W = state.w, H = state.h;
+    ctx.clearRect(0, 0, W, H);
+
+    const R = Math.min((W - 90) / TAU, H * 0.155);
+    const r = R * State.innerRatio;
+    const x0 = 44;
+    const roadY = H * 0.20, y2 = H * 0.52, y3 = H * 0.80;
+    const span = TAU * R;
+
+    const drawBaseline = (y, col) => {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x0 - 14, y);
+      ctx.lineTo(x0 + span + 16, y);
+      ctx.stroke();
+    };
+
+    const drawCaption = (txt, y) => {
+      ctx.font = Font.mono(9.5);
+      ctx.fillStyle = LIGHT_PAL.ink60;
+      ctx.fillText(txt, x0 - 14, y - 10);
+    };
+
+    // Phase A — one roll on the road
+    const a = Utils.clamp(progress / 0.36, 0, 1);
+    drawBaseline(roadY, LIGHT_PAL.line);
+    drawCaption('THE ROAD', roadY);
+    ctx.strokeStyle = LIGHT_PAL.line;
+    ctx.beginPath();
+    ctx.moveTo(x0, roadY - 8);
+    ctx.lineTo(x0, roadY + 8);
+    ctx.stroke();
+    if (a >= 1) {
+      ctx.strokeStyle = LIGHT_PAL.copper;
+      ctx.beginPath();
+      ctx.moveTo(x0 + span, roadY - 8);
+      ctx.lineTo(x0 + span, roadY + 8);
+      ctx.stroke();
+    }
+
+    const fade = Utils.clamp(1 - (progress - 0.36) / 0.12, 0, 1);
+    if (progress < 0.48) {
+      const phi = a * TAU;
+      const wx = x0 + R * phi;
+      const wy = roadY - R - (1 - fade) * 46;
+      ctx.globalAlpha = fade;
+
+      ctx.lineWidth = 2.2;
+      ctx.strokeStyle = LIGHT_PAL.copper;
+      ctx.beginPath();
+      ctx.arc(wx, wy, R, 0, TAU);
+      ctx.stroke();
+
+      ctx.lineWidth = 1.6;
+      ctx.strokeStyle = LIGHT_PAL.lapis;
+      ctx.beginPath();
+      ctx.arc(wx, wy, r, 0, TAU);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(23, 25, 30, 0.3)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        const s = phi + i * Math.PI / 3;
+        ctx.beginPath();
+        ctx.moveTo(wx, wy);
+        ctx.lineTo(wx + Math.cos(s) * R * 0.94, wy + Math.sin(s) * R * 0.94);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    }
+
+    // Bracket for revolution
+    if (progress > 0.38) {
+      const bt = Utils.clamp((progress - 0.38) / 0.1, 0, 1);
+      ctx.globalAlpha = bt;
+      ctx.strokeStyle = LIGHT_PAL.ink;
+      ctx.lineWidth = 1;
+      const by = roadY + 22;
+      ctx.beginPath();
+      ctx.moveTo(x0, by);
+      ctx.lineTo(x0 + span * bt, by);
+      ctx.moveTo(x0, by - 4);
+      ctx.lineTo(x0, by + 4);
+      ctx.moveTo(x0 + span, by - 4);
+      ctx.lineTo(x0 + span, by + 4);
+      ctx.stroke();
+      ctx.font = Font.mono(10);
+      ctx.fillStyle = LIGHT_PAL.ink;
+      ctx.fillText('d — one revolution of the axle', x0 + span * 0.5 - 80, by + 16);
+      ctx.globalAlpha = 1;
+    }
+
+    // Phase C — outer unrolls
+    if (progress > 0.48) {
+      const t = Utils.clamp((progress - 0.48) / 0.24, 0, 1);
+      drawBaseline(y2, LIGHT_PAL.line);
+      drawCaption('EDGE OF THE GREATER CIRCLE', y2);
+      ctx.strokeStyle = LIGHT_PAL.copper;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x0, y2);
+      ctx.lineTo(x0 + span * t, y2);
+      ctx.stroke();
+
+      if (t < 1) {
+        const cx2 = x0 + R * t * TAU;
+        ctx.lineWidth = 1.6;
+        ctx.strokeStyle = LIGHT_PAL.copper;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        ctx.arc(cx2, y2 - R, R, 0, TAU);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(cx2, y2 - R);
+        ctx.lineTo(
+          cx2 + Math.cos(t * TAU + Math.PI / 2) * R * 0.9,
+          y2 - R + Math.sin(t * TAU + Math.PI / 2) * R * 0.9
+        );
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.font = Font.mono(10.5);
+        ctx.fillStyle = LIGHT_PAL.copper;
+        if (x0 + span + 14 <= W - 80) {
+          ctx.fillText('2πR = d  ✓', x0 + span + 14, y2 + 4);
+        } else {
+          ctx.fillText('2πR = d  ✓', x0, y2 + 18);
+        }
+      }
+    }
+
+    // Phase D — inner unrolls, falls short
+    if (progress > 0.72) {
+      const t = Utils.clamp((progress - 0.72) / 0.25, 0, 1);
+      drawBaseline(y3, LIGHT_PAL.line);
+      drawCaption('EDGE OF THE LESSER CIRCLE', y3);
+      const len = TAU * r;
+      ctx.strokeStyle = LIGHT_PAL.lapis;
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x0, y3);
+      ctx.lineTo(x0 + len * t, y3);
+      ctx.stroke();
+
+      if (t < 1) {
+        const cx3 = x0 + r * t * TAU;
+        ctx.lineWidth = 1.6;
+        ctx.globalAlpha = 0.85;
+        ctx.beginPath();
+        ctx.arc(cx3, y3 - r, r, 0, TAU);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+      } else {
+        ctx.strokeStyle = LIGHT_PAL.verm;
+        ctx.lineWidth = 1.4;
+        for (let hx = x0 + len + 5; hx < x0 + span - 3; hx += 8) {
+          ctx.beginPath();
+          ctx.moveTo(hx, y3 + 7);
+          ctx.lineTo(hx + 6, y3 - 7);
+          ctx.stroke();
+        }
+        ctx.strokeStyle = LIGHT_PAL.lapis;
+        ctx.beginPath();
+        ctx.moveTo(x0 + span, y3 - 8);
+        ctx.lineTo(x0 + span, y3 + 8);
+        ctx.stroke();
+
+        ctx.font = Font.mono(10.5);
+        ctx.fillStyle = LIGHT_PAL.verm;
+        ctx.fillText('short by 2π(R−r)  ✗', x0 + len + 12, y3 - 14);
+
+        const st2 = Utils.clamp((progress - 0.96) / 0.04, 0, 1);
+        if (st2 > 0) {
+          ctx.globalAlpha = st2 * 0.55;
+          ctx.font = Font.serif(26, true);
+          ctx.fillStyle = LIGHT_PAL.ink;
+          ctx.fillText('The Absurdity.', W - 200, H - 18);
+          ctx.globalAlpha = 1;
+        }
+      }
+    }
+  }
+  if (REDUCED_MOTION) drawClaim(1);
+  document.getElementById('claimFrame').addEventListener('click', () => { claimTime = 0; });
+
+  /* =================================================================
+     §6 — STAGE SECTION (scrollytelling instrument)
+     ================================================================= */
+  const stageCanvas = new CanvasManager(document.getElementById('stageCanvas'));
+  const stageFrame = document.getElementById('stageFrame');
+  const stageHud = document.getElementById('stageHud');
+  const dragHint = document.getElementById('dragHint');
+
+  let stageTheta = 0;
+  let stageMode = 0;
+  let stagePaused = false;
+  let stageDragging = false;
+  let stageLastX = 0;
+  let stageLastActivity = -1e9;
+  let showTraces = true;
+  let showSlip = true;
+  let showMeasure = true;
+
+  function drawStage(now) {
+    const { ctx, state } = stageCanvas;
+    const R = Math.min(state.h * 0.29, state.w * 0.14);
+
+    if (stageMode > 0 && !stagePaused && !stageDragging
+        && (now - stageLastActivity > 1400) && !REDUCED_MOTION) {
+      stageTheta += 0.72 * State.speed * (1 / 60);
+    }
+
+    renderWheel(ctx, state.w, state.h, {
+      theta: stageTheta,
+      K: State.innerRatio,
+      R, cx: state.w * 0.40, gy: state.h * 0.62,
+      dims:     stageMode === 0,
+      pulse:    stageMode >= 1,
+      traces:   stageMode >= 2 && showTraces,
+      slip:     stageMode >= 2 && showSlip,
+      brackets: stageMode >= 3 && showMeasure,
+      hatch:    stageMode >= 3 && showMeasure,
+      panel:    stageMode >= 3 && showMeasure,
+      age:      stageMode >= 3 ? TAU * 2.6 : TAU * 1.6,
+      from: 0,
+    });
+
+    const deg = (stageTheta * 180 / Math.PI) % 360;
+    stageHud.textContent =
+      `θ ${deg.toFixed(1).padStart(5, '0')}° · x/R ${stageTheta.toFixed(2)}`;
+  }
+
+  // Drag interaction
+  stageCanvas.el.addEventListener('pointerdown', (e) => {
+    stageDragging = true;
+    stageLastX = e.clientX;
+    stageLastActivity = performance.now();
+    stageCanvas.el.classList.add('grabbing');
+    stageCanvas.el.setPointerCapture(e.pointerId);
+    dragHint.classList.add('hidden');
+  });
+
+  stageCanvas.el.addEventListener('pointermove', (e) => {
+    if (!stageDragging) return;
+    const R = Math.min(stageCanvas.state.h * 0.29, stageCanvas.state.w * 0.14);
+    stageTheta += (e.clientX - stageLastX) / R;
+    stageLastX = e.clientX;
+    stageLastActivity = performance.now();
+  });
+
+  ['pointerup', 'pointercancel'].forEach((ev) =>
+    stageCanvas.el.addEventListener(ev, () => {
+      stageDragging = false;
+      stageCanvas.el.classList.remove('grabbing');
+      stageLastActivity = performance.now();
+    })
+  );
+
+  // Step activation via IntersectionObserver
+  const stepElements = [...document.querySelectorAll('.step')];
+  const stepObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        stageMode = +entry.target.dataset.step;
+        stageFrame.dataset.mode = stageMode;
+        stepElements.forEach((s) => s.classList.toggle('active', s === entry.target));
+      }
+    });
+  }, { rootMargin: '-42% 0px -42% 0px' });
+  stepElements.forEach((s) => stepObserver.observe(s));
+
+  // Bench controls
+  const stPlayBtn = document.getElementById('stPlay');
+  stPlayBtn.addEventListener('click', () => {
+    stagePaused = !stagePaused;
+    stPlayBtn.textContent = stagePaused ? '▶ Roll' : '❚❚ Pause';
+    stPlayBtn.setAttribute('aria-pressed', String(!stagePaused));
+  });
+
+  document.getElementById('stReset').addEventListener('click', () => {
+    stageTheta = 0;
+  });
+
+  const ratioInput = document.getElementById('ratio');
+  ratioInput.addEventListener('input', () => {
+    State.innerRatio = +ratioInput.value;
+    document.getElementById('ratioOut').textContent = State.innerRatio.toFixed(2);
+    if (REDUCED_MOTION) { drawHero(); drawClaim(claimTime); }
+  });
+
+  const speedInput = document.getElementById('speed');
+  speedInput.addEventListener('input', () => {
+    State.speed = +speedInput.value;
+    document.getElementById('speedOut').textContent = State.speed.toFixed(1) + '×';
+  });
+
+  document.getElementById('swTraces').addEventListener('change', (e) => { showTraces = e.target.checked; });
+  document.getElementById('swSlip').addEventListener('change',   (e) => { showSlip   = e.target.checked; });
+  document.getElementById('swMeas').addEventListener('change',   (e) => { showMeasure = e.target.checked; });
+
+  /* =================================================================
+     §7 — POLYGON MACHINE (Galileo's polygons)
+     ================================================================= */
+  const polyCanvas = new CanvasManager(document.getElementById('polyCanvas'));
+  let polyN = 6;
+  let polyInfinity = false;
+  let polyTheta = 0;
+  let polyPaused = REDUCED_MOTION;
+  let polyLastM = -1;
+  let polyTrailOuter = [];
+  let polyTrailInner = [];
+  let polyPrints = [];
+
+  const rotate = (p, a) => ({
+    x: p.x * Math.cos(a) - p.y * Math.sin(a),
+    y: p.x * Math.sin(a) + p.y * Math.cos(a),
+  });
+
+  function polyReset() {
+    polyTheta = 0;
+    polyLastM = -1;
+    polyTrailOuter = [];
+    polyTrailInner = [];
+    polyPrints = [];
+  }
+
+  function updatePolyCounters() {
+    document.getElementById('cnSides').textContent = polyInfinity ? '∞' : polyN;
+    document.getElementById('cnVoids').textContent = polyInfinity ? '∞' : polyN;
+    document.getElementById('cnShare').textContent = Math.round((1 - State.innerRatio) * 100);
+    document.getElementById('cnStep').innerHTML = polyInfinity
+      ? '—'
+      : (2 * Math.sin(Math.PI / polyN)).toFixed(2) + '<small>·R</small>';
+  }
+
+  function drawPoly(now) {
+    const { ctx, state } = polyCanvas;
+    const W = state.w, H = state.h;
+
+    if (!polyPaused && !REDUCED_MOTION) {
+      polyTheta += 0.55 * State.speed * (1 / 60);
+    }
+
+    const R = Math.min(H * 0.23, W * 0.10, 130);
+    const gy = H * 0.56, cx = W * 0.44;
+
+    // ─── Infinity Mode (circle limit) ───
+    if (polyInfinity) {
+      renderWheel(ctx, W, H, {
+        theta: polyTheta,
+        K: State.innerRatio,
+        R: R * 1.25, cx, gy,
+        palette: DARK_PAL,
+        traces: true, pulse: true, age: TAU * 2,
+      });
+      const y2 = gy + 42;
+      const span = TAU * R * 1.25;
+      ctx.strokeStyle = DARK_PAL.line;
+      ctx.beginPath();
+      ctx.moveTo(0, y2);
+      ctx.lineTo(W, y2);
+      ctx.stroke();
+
+      ctx.strokeStyle = DARK_PAL.verm;
+      ctx.lineWidth = 1;
+      ctx.globalAlpha = 0.8;
+      const wmin = R * 1.25 * polyTheta - cx;
+      const wmax = wmin + W;
+      const tick = span / 40;
+      for (let q = Math.ceil(wmin / tick); q <= Math.floor(wmax / tick); q++) {
+        const sx = cx + q * tick - R * 1.25 * polyTheta;
+        ctx.beginPath();
+        ctx.moveTo(sx, y2 - 3);
+        ctx.lineTo(sx, y2 + 3);
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.font = Font.mono(9.5);
+      ctx.fillStyle = DARK_PAL.ink60;
+      ctx.fillText('n → ∞ : the line looks continuous — voids: infinitely many, each of measure zero', 16, y2 + 20);
+      updatePolyCounters();
+      return;
+    }
+
+    // ─── Polygon Mode ───
+    const n = polyN;
+    const s = 2 * R * Math.sin(Math.PI / n);
+    const apoth = R * Math.cos(Math.PI / n);
+    const stepAng = TAU / n;
+    const u = polyTheta / stepAng;
+    const m = Math.floor(u);
+    const phi = (u - m) * stepAng;
+
+    const V = { x: (m + 1) * s, y: 0 };
+    const alpha = Math.PI / 2 + Math.PI / n - phi;
+    const C = {
+      x: V.x + R * Math.cos(alpha),
+      y: R * Math.sin(alpha),
+    };
+    const off = cx - C.x;
+    const SX = (p) => p.x + off;
+    const SY = (p) => gy - p.y;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = DARK_PAL.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Deposit completed prints
+    while (polyLastM < m) {
+      polyLastM++;
+      if (polyLastM > 0) polyPrints.push(polyLastM - 1);
+    }
+    if (polyPrints.length > 60) polyPrints.splice(0, polyPrints.length - 60);
+
+    // Ground
+    ctx.strokeStyle = DARK_PAL.line;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, gy);
+    ctx.lineTo(W, gy);
+    ctx.stroke();
+
+    // Printed line of lesser wheel
+    const y2 = gy + 44;
+    ctx.strokeStyle = DARK_PAL.line;
+    ctx.beginPath();
+    ctx.moveTo(0, y2);
+    ctx.lineTo(W, y2);
+    ctx.stroke();
+
+    const arch = (1 - State.innerRatio) * R * 0.45;
+    polyPrints.forEach((i) => {
+      const xa = i * s + off;
+      if (xa < -60 || xa > W + 60) return;
+      const ka = xa + State.innerRatio * s;
+
+      ctx.strokeStyle = DARK_PAL.lapis;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(xa, y2);
+      ctx.quadraticCurveTo((xa + ka) / 2, y2 - arch * 2, ka, y2);
+      ctx.stroke();
+
+      ctx.strokeStyle = DARK_PAL.verm;
+      ctx.lineWidth = 1.3;
+      const g0 = ka + 3;
+      const g1 = (i + 1) * s + off - 3;
+      for (let hx = g0; hx < g1; hx += 6) {
+        ctx.beginPath();
+        ctx.moveTo(hx, y2 + 5);
+        ctx.lineTo(hx + 4, y2 - 5);
+        ctx.stroke();
+      }
+    });
+
+    ctx.font = Font.mono(9.5);
+    ctx.fillStyle = DARK_PAL.ink60;
+    ctx.fillText('printed line of the lesser wheel — arc laid down, void left behind', 16, y2 + 22);
+
+    // Vertex helpers
+    const beta = (j) => -Math.PI / 2 + Math.PI / n + j * TAU / n;
+    const restC = { x: (m + 0.5) * s, y: apoth };
+
+    const vert = (j) => {
+      const b = beta(j);
+      const rp = { x: restC.x + R * Math.cos(b), y: restC.y + R * Math.sin(b) };
+      return { x: V.x, y: V.y, ...rotate({ x: rp.x - V.x, y: rp.y - V.y }, -phi) };
+    };
+
+    const ivert = (j) => {
+      const b = beta(j);
+      const rp = {
+        x: restC.x + State.innerRatio * R * Math.cos(b),
+        y: restC.y + State.innerRatio * R * Math.sin(b),
+      };
+      return rotate({ x: rp.x - V.x, y: rp.y - V.y }, -phi);
+    };
+
+    // Trails
+    const tv = vert(n - 1);
+    const ti0 = ivert(n - 1);
+    const ti = { x: V.x + ti0.x, y: V.y + ti0.y };
+    polyTrailOuter.push({ x: tv.x, y: tv.y });
+    polyTrailInner.push({ x: ti.x, y: ti.y });
+
+    const cut = C.x - TAU * R * 1.6;
+    while (polyTrailOuter.length && polyTrailOuter[0].x < cut) {
+      polyTrailOuter.shift();
+      polyTrailInner.shift();
+    }
+
+    const drawTrail = (tr, col) => {
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      const N = tr.length;
+      for (let i = 1; i < N; i++) {
+        ctx.globalAlpha = Math.pow(i / N, 1.4) * 0.9;
+        ctx.beginPath();
+        ctx.moveTo(SX(tr[i - 1]), SY(tr[i - 1]));
+        ctx.lineTo(SX(tr[i]), SY(tr[i]));
+        ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+    };
+    drawTrail(polyTrailOuter, DARK_PAL.copper);
+    drawTrail(polyTrailInner, DARK_PAL.lapis);
+
+    // Outer polygon
+    ctx.beginPath();
+    for (let j = 0; j < n; j++) {
+      const p = vert(j);
+      j ? ctx.lineTo(SX(p), SY(p)) : ctx.moveTo(SX(p), SY(p));
+    }
+    ctx.closePath();
+    ctx.strokeStyle = DARK_PAL.copper;
+    ctx.lineWidth = 2.2;
+    ctx.stroke();
+
+    // Inner polygon
+    ctx.beginPath();
+    for (let j = 0; j < n; j++) {
+      const p = ivert(j);
+      j ? ctx.lineTo(V.x + p.x + off, gy - (V.y + p.y))
+        : ctx.moveTo(V.x + p.x + off, gy - (V.y + p.y));
+    }
+    ctx.closePath();
+    ctx.strokeStyle = DARK_PAL.lapis;
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+
+    // Spokes
+    ctx.strokeStyle = 'rgba(237, 234, 227, 0.16)';
+    ctx.lineWidth = 1;
+    for (let j = 0; j < n; j++) {
+      const p = vert(j);
+      ctx.beginPath();
+      ctx.moveTo(SX(C), SY(C));
+      ctx.lineTo(SX(p), SY(p));
+      ctx.stroke();
+    }
+
+    // Center axle
+    ctx.fillStyle = DARK_PAL.ink;
+    ctx.beginPath();
+    ctx.arc(SX(C), SY(C), 3, 0, TAU);
+    ctx.fill();
+
+    // Pivot + lurch flash
+    const flash = 1 - Utils.clamp(phi / (stepAng * 0.3), 0, 1);
+    ctx.fillStyle = DARK_PAL.verm;
+    ctx.beginPath();
+    ctx.arc(V.x + off, gy, 3.4 + flash * 3, 0, TAU);
+    ctx.fill();
+    if (flash > 0) {
+      ctx.strokeStyle = DARK_PAL.verm;
+      ctx.globalAlpha = flash * 0.6;
+      ctx.beginPath();
+      ctx.arc(V.x + off, gy, 6 + (1 - flash) * 14, 0, TAU);
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
+
+    // Traced dots
+    ctx.fillStyle = DARK_PAL.copper;
+    ctx.beginPath();
+    ctx.arc(SX(tv), SY(tv), 4, 0, TAU);
+    ctx.fill();
+    ctx.fillStyle = DARK_PAL.lapis;
+    ctx.beginPath();
+    ctx.arc(SX(ti), SY(ti), 3.4, 0, TAU);
+    ctx.fill();
+
+    updatePolyCounters();
+  }
+
+  // Polygon controls
+  const nSidesInput = document.getElementById('nSides');
+  const nOutEl = document.getElementById('nOut');
+  const chipButtons = [...document.querySelectorAll('.nchip')];
+
+  function setPolygonSides(v) {
+    if (v === 'inf') {
+      polyInfinity = true;
+      nOutEl.textContent = '∞';
+    } else {
+      polyInfinity = false;
+      polyN = +v;
+      nSidesInput.value = polyN;
+      nOutEl.textContent = polyN;
+    }
+    chipButtons.forEach((c) => c.classList.toggle('active', c.dataset.n === String(v)));
+    polyReset();
+  }
+
+  nSidesInput.addEventListener('input', () => setPolygonSides(nSidesInput.value));
+  chipButtons.forEach((c) => c.addEventListener('click', () => setPolygonSides(c.dataset.n)));
+  setPolygonSides(6);
+
+  const plPlayBtn = document.getElementById('plPlay');
+  plPlayBtn.addEventListener('click', () => {
+    polyPaused = !polyPaused;
+    plPlayBtn.textContent = polyPaused ? '▶ Roll' : '❚❚ Pause';
+    plPlayBtn.setAttribute('aria-pressed', String(!polyPaused));
+  });
+  if (REDUCED_MOTION) {
+    plPlayBtn.textContent = '▶ Roll';
+    plPlayBtn.setAttribute('aria-pressed', 'false');
+  }
+
+  /* =================================================================
+     §8 — VISIBILITY, REVEALS & CHROME
+     ================================================================= */
+  function watchSection(id, key) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    new IntersectionObserver(
+      (entries) => entries.forEach((e) => { State.visibility[key] = e.isIntersecting; }),
+      { rootMargin: '80px' }
+    ).observe(el);
+  }
+
+  watchSection('heroSec', 'hero');
+  watchSection('claimFrame', 'claim');
+  watchSection('stageFrame', 'inst');
+  watchSection('polyCanvas', 'poly');
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('revealed');
+        revealObserver.unobserve(e.target);
+      }
+    }),
+    { threshold: 0.18 }
+  );
+  document.querySelectorAll('[data-reveal], .led-row').forEach((el) => revealObserver.observe(el));
+  if (REDUCED_MOTION) {
+    document.querySelectorAll('[data-reveal]').forEach((el) => el.classList.add('revealed'));
+  }
+
+  const progressEl = document.getElementById('progress');
+  window.addEventListener('scroll', () => {
+    const doc = document.documentElement;
+    progressEl.style.width =
+      (doc.scrollTop / (doc.scrollHeight - doc.clientHeight) * 100) + '%';
+  }, { passive: true });
+
+  /* =================================================================
+     §9 — MASTER ANIMATION LOOP
+     ================================================================= */
+  let lastFrameTime = performance.now();
+
+  function tick(now) {
+    const dt = Math.min((now - lastFrameTime) / 1000, 0.05);
+    lastFrameTime = now;
+
+    if (State.visibility.hero && !REDUCED_MOTION) {
+      heroTheta += 0.5 * State.speed * dt * 1.7;
+      drawHero();
+    }
+
+    if (State.visibility.claim) {
+      if (!REDUCED_MOTION) {
+        claimTime += dt / 9.5;
+        if (claimTime > 1.18) claimTime = 0;
+        drawClaim(Utils.clamp(claimTime, 0, 1));
+      }
+    }
+
+    if (State.visibility.inst) drawStage(now);
+    if (State.visibility.poly) drawPoly(now);
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+
+  // Static fallbacks if sections unseen at load with reduced motion
+  if (REDUCED_MOTION) {
+    drawStage(0);
+    drawPoly(0);
+  }
+
+  /* =================================================================
+     §10 — SIGNATURE
+     ================================================================= */
+  console.log(
+    '%c◈ Aristotle\'s Wheel · Paradox Explainer ◈\n' +
+    '%cDesigned & Developed by Priyanshu Gupta\n' +
+    '%c⟡ An exploration of geometry, motion, and infinity ⟡',
+    'color: #B3672B; font-size: 14px; font-weight: bold;',
+    'color: #17191E; font-size: 12px; font-style: italic;',
+    'color: #2F5FA8; font-size: 11px;'
+  );
+})();
+</script>
+</body>
+</html>
