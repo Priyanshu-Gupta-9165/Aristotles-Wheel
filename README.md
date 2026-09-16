@@ -16,17 +16,26 @@
 
 <br/>
 
-[![Version](https://img.shields.io/badge/Version-1.0.0-B3672B?style=for-the-badge)](https://github.com/PriyanshuGupta-Dev/aristotles-wheel/releases)
+[![Live Demo](https://img.shields.io/badge/🌐%20Live%20Demo-Explore%20Online-B3672B?style=for-the-badge&logo=googlechrome&logoColor=white)](https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/)
+[![Version](https://img.shields.io/badge/Version-1.0.0-B3672B?style=for-the-badge)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/releases)
 [![License](https://img.shields.io/badge/License-MIT-17191E?style=for-the-badge)](LICENSE)
-[![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen?style=for-the-badge)](https://github.com/PriyanshuGupta-Dev/aristotles-wheel)
+[![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen?style=for-the-badge)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel)
 [![Built with](https://img.shields.io/badge/Built%20With-HTML%20%C2%B7%20CSS%20%C2%B7%20JS-E34F26?style=for-the-badge&logo=javascript&logoColor=white)](#)
 
 [![Render](https://img.shields.io/badge/Render-Canvas%202D-2F5FA8?style=for-the-badge)](#)
 [![Frame rate](https://img.shields.io/badge/Frame%20Rate-60%20fps-C63D1F?style=for-the-badge)](#)
 [![Motion](https://img.shields.io/badge/Motion-Reduced--motion%20safe-17191E?style=for-the-badge)](#)
 [![Bundle](https://img.shields.io/badge/Bundle-1%20file%20%C2%B7%200%20build-B3672B?style=for-the-badge)](#)
-[![Stars](https://img.shields.io/github/stars/PriyanshuGupta-Dev/aristotles-wheel?style=for-the-badge&color=B3672B&label=STARS)](https://github.com/PriyanshuGupta-Dev/aristotles-wheel/stargazers)
-[![Readers](https://komarev.com/ghpvc/?username=PriyanshuGupta-Dev&style=for-the-badge&color=2F5FA8&label=READERS)](#)
+[![Stars](https://img.shields.io/github/stars/Priyanshu-Gupta-9165/Aristotles-Wheel?style=for-the-badge&color=B3672B&label=STARS)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/stargazers)
+[![Readers](https://komarev.com/ghpvc/?username=Priyanshu-Gupta-9165&style=for-the-badge&color=2F5FA8&label=READERS)](#)
+
+<br/>
+
+<p align="center">
+  <a href="https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/">
+    <img src="https://img.shields.io/badge/▶%20CLICK%20TO%20ROLL%20THE%20WHEEL-priyanshu--gupta--9165.github.io%2FAristotles--Wheel-2F5FA8?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=17191E" alt="Live Application" />
+  </a>
+</p>
 
 </div>
 
@@ -289,10 +298,19 @@ aristotles-wheel/
 
 ## ◆ Quick Start
 
+### 🌐 Live Web Experience
+Launch the interactive instrument directly in your browser without any setup:
+
+👉 **[https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/](https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/)**
+
+---
+
+### 💻 Local Exploration
+
 ```bash
 # 1 · Clone
-git clone https://github.com/PriyanshuGupta-Dev/aristotles-wheel.git
-cd aristotles-wheel
+git clone https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel.git
+cd Aristotles-Wheel
 
 # 2 · Serve (any static server — or just double-click index.html)
 npx serve .
@@ -361,9 +379,9 @@ No install. No build. No network calls beyond web fonts.
 
 *Designer & Developer — building instruments that make ideas move.*
 
-[![GitHub](https://img.shields.io/badge/GitHub-PriyanshuGupta--Dev-17191E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/PriyanshuGupta-Dev)
+[![GitHub](https://img.shields.io/badge/GitHub-Priyanshu--Gupta--9165-17191E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Priyanshu-Gupta-9165)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-2F5FA8?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/)
-[![Portfolio](https://img.shields.io/badge/Portfolio-Visit-B3672B?style=for-the-badge&logo=googlechrome&logoColor=white)](#)
+[![Live App](https://img.shields.io/badge/Live%20App-Visit-B3672B?style=for-the-badge&logo=googlechrome&logoColor=white)](https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/)
 
 </div>
 
@@ -377,7 +395,7 @@ No install. No build. No network calls beyond web fonts.
 
 Every star greases the axle — and tells me to keep building instruments like this one.
 
-[![Star this repo](https://img.shields.io/badge/⭐%20STAR%20THIS%20REPO-It%20takes%20one%20click-17191E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/PriyanshuGupta-Dev/aristotles-wheel/stargazers)
+[![Star this repo](https://img.shields.io/badge/⭐%20STAR%20THIS%20REPO-It%20takes%20one%20click-17191E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/stargazers)
 
 **1.** Star it &nbsp;·&nbsp; **2.** Fork it &nbsp;·&nbsp; **3.** Send it to someone who loves a good paradox.
 
