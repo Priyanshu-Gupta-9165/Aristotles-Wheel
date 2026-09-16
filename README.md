@@ -2,7 +2,7 @@
   ════════════════════════════════════════════════════════════════
   ARISTOTLE'S WHEEL · README
   Crafted by Priyanshu Gupta
-  Replace `PriyanshuGupta-Dev/aristotles-wheel` with your repo path.
+  Repository: Priyanshu-Gupta-9165/Aristotles-Wheel
   ════════════════════════════════════════════════════════════════
 -->
 
@@ -20,14 +20,14 @@
 [![Version](https://img.shields.io/badge/Version-1.0.0-B3672B?style=for-the-badge)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/releases)
 [![License](https://img.shields.io/badge/License-MIT-17191E?style=for-the-badge)](LICENSE)
 [![Dependencies](https://img.shields.io/badge/Dependencies-0-brightgreen?style=for-the-badge)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel)
-[![Built with](https://img.shields.io/badge/Built%20With-HTML%20%C2%B7%20CSS%20%C2%B7%20JS-E34F26?style=for-the-badge&logo=javascript&logoColor=white)](#)
+[![Built with](https://img.shields.io/badge/Built%20With-HTML%20%C2%B7%20CSS%20%C2%B7%20JS-E34F26?style=for-the-badge&logo=javascript&logoColor=white)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/blob/main/index.html)
 
-[![Render](https://img.shields.io/badge/Render-Canvas%202D-2F5FA8?style=for-the-badge)](#)
-[![Frame rate](https://img.shields.io/badge/Frame%20Rate-60%20fps-C63D1F?style=for-the-badge)](#)
-[![Motion](https://img.shields.io/badge/Motion-Reduced--motion%20safe-17191E?style=for-the-badge)](#)
-[![Bundle](https://img.shields.io/badge/Bundle-1%20file%20%C2%B7%200%20build-B3672B?style=for-the-badge)](#)
+[![Render](https://img.shields.io/badge/Render-Canvas%202D-2F5FA8?style=for-the-badge)](https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/)
+[![Frame rate](https://img.shields.io/badge/Frame%20Rate-60%20fps-C63D1F?style=for-the-badge)](https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/)
+[![Motion](https://img.shields.io/badge/Motion-Reduced--motion%20safe-17191E?style=for-the-badge)](#accessibility--browser-support)
+[![Bundle](https://img.shields.io/badge/Bundle-1%20file%20%C2%B7%200%20build-B3672B?style=for-the-badge)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/blob/main/index.html)
 [![Stars](https://img.shields.io/github/stars/Priyanshu-Gupta-9165/Aristotles-Wheel?style=for-the-badge&color=B3672B&label=STARS)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel/stargazers)
-[![Readers](https://komarev.com/ghpvc/?username=Priyanshu-Gupta-9165&style=for-the-badge&color=2F5FA8&label=READERS)](#)
+[![Readers](https://komarev.com/ghpvc/?username=Priyanshu-Gupta-9165&style=for-the-badge&color=2F5FA8&label=READERS)](https://github.com/Priyanshu-Gupta-9165/Aristotles-Wheel)
 
 <br/>
 
@@ -51,20 +51,20 @@
 
 | | | |
 |:---:|:---|:---|
-| **01** | [The Paradox, In One Breath](#-the-paradox-in-one-breath) | What breaks, and why it shouldn't |
-| **02** | [Motion Study](#-motion-study) | The wheel, frame by frame |
-| **03** | [Features](#-features) | Everything the page does |
-| **04** | [Gallery](#-gallery) | Plates from the two acts |
-| **05** | [Page Map](#-page-map) | Section by section |
-| **06** | [Design System](#-design-system) | Palette, type, motion, texture |
-| **07** | [The Mathematics](#-the-mathematics) | Three lines that dissolve it |
-| **08** | [Architecture](#-architecture) | Engine, structure, performance |
-| **09** | [Interaction Catalog](#-interaction-catalog) | Every control, documented |
-| **10** | [Quick Start](#-quick-start) | Zero to rolling in 30 seconds |
-| **11** | [Customization](#-customization) | Make the wheel yours |
-| **12** | [Accessibility & Support](#-accessibility--browser-support) | Built for everyone |
-| **13** | [Roadmap & Changelog](#-roadmap) | Where the wheel goes next |
-| **14** | [Author & Support](#-author) | Say hello, leave a star |
+| **01** | [The Paradox, In One Breath](#the-paradox-in-one-breath) | What breaks, and why it shouldn't |
+| **02** | [Motion Study](#motion-study) | The wheel, frame by frame |
+| **03** | [Features](#features) | Everything the page does |
+| **04** | [Gallery](#gallery) | Plates from the two acts |
+| **05** | [Page Map](#page-map) | Section by section |
+| **06** | [Design System](#design-system) | Palette, type, motion, texture |
+| **07** | [The Mathematics](#the-mathematics) | Three lines that dissolve it |
+| **08** | [Architecture](#architecture) | Engine, structure, performance |
+| **09** | [Interaction Catalog](#interaction-catalog) | Every control, documented |
+| **10** | [Quick Start](#quick-start) | Zero to rolling in 30 seconds |
+| **11** | [Customization](#customization) | Make the wheel yours |
+| **12** | [Accessibility & Support](#accessibility--browser-support) | Built for everyone |
+| **13** | [Roadmap & Changelog](#roadmap) | Where the wheel goes next |
+| **14** | [Author & Support](#author) | Say hello, leave a star |
 
 ---
 
@@ -380,7 +380,7 @@ No install. No build. No network calls beyond web fonts.
 *Designer & Developer — building instruments that make ideas move.*
 
 [![GitHub](https://img.shields.io/badge/GitHub-Priyanshu--Gupta--9165-17191E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Priyanshu-Gupta-9165)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-2F5FA8?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-2F5FA8?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/priyanshu-gupta-9165/)
 [![Live App](https://img.shields.io/badge/Live%20App-Visit-B3672B?style=for-the-badge&logo=googlechrome&logoColor=white)](https://priyanshu-gupta-9165.github.io/Aristotles-Wheel/)
 
 </div>
